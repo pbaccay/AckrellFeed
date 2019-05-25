@@ -1,0 +1,55 @@
+{
+  "name": "ackrell",
+  "version": "1.0.0",
+  "main": "app.js",
+  "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
+    "async": "0.7.0",
+    "aws-sdk": "^2.368.0",
+    "bcrypt": "^3.0.2",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.15.0",
+    "bson": "^3.0.2",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.1",
+    "debug": "^2.2.0",
+    "dom-parser": "^0.1.5",
+    "dotenv": "^6.1.0",
+    "ejs": "^2.6.1",
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
+    "jsdom": "^13.0.0",
+    "mongoose": "^4.4.5",
+    "morgan": "^1.7.0",
+    "mysql": "*",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "passport-facebook-token": "^3.3.0",
+    "passport-google-oauth": "^1.0.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "passport-twitter": "^1.0.4",
+    "passport-twitter-token": "^1.3.0",
+    "query-selector": "^1.0.9",
+    "request": "^2.81.0",
+    "rss-parser": "*",
+    "serve-favicon": "~2.2.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pbaccay/ackrellfeed.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pbaccay/ackrellfeed/issues"
+  },
+  "homepage": "https://github.com/pbaccay/ackrellfeed#readme",
+  "keywords": [],
+  "description": ""
+}
