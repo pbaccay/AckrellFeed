@@ -20,9 +20,10 @@ var css = "";
 
 var i = 0;
 // load aws sdk
-
 // load aws config
 aws.config.loadFromPath('config.json');
+
+
 
 // this must relate to a verified SES account
 var from = 'test@fixplanner.com'
@@ -36,7 +37,7 @@ var ackrelllogo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAj8AAAHgCAMAAAB
 var ackrelldesc = "Cannabis and Marijuana industry newsfor investors";
 var ackrellpubDate = new Date();
 var ackrellserverupdateid = 1;
-var feedackrelldb = new AckrellFeed({feed_title: ackrelltitle, feed_url: ackrellurl, feed_type:"rss", feed_generator: "", feed_img: ackrelllogo, 
+var feedackrelldb = new AckrellFeed({feed_title: ackrelltitle, feed_url: ackrellurl, feed_link: ackrellurl, feed_type:"rss", feed_generator: "", feed_img: ackrelllogo, 
 			feed_description: ackrelldesc, feed_lastBuildDate: ackrellpubDate,  feed_updated: new Date(), feed_serverUpdateID: ackrellserverupdateid, feed_items: []});	  
 	 console.log('PBK saveAcrellFeedtoDB : ' + ackrellurl );
 			AckrellFeed.find({feed_url: ackrellurl}).count( function(err, count) {
@@ -52,7 +53,7 @@ var feedackrelldb = new AckrellFeed({feed_title: ackrelltitle, feed_url: ackrell
 						});
 					}
 			});
-var feedpendingackrelldb = new AckrellFeed({feed_title: ackrellPendingtitle, feed_url: ackrellpendingurl, feed_type:"rss", feed_generator: "", feed_img: ackrelllogo, 
+var feedpendingackrelldb = new AckrellFeed({feed_title: ackrellPendingtitle, feed_url: ackrellpendingurl, feed_link: ackrellpendingurl, feed_type:"rss", feed_generator: "", feed_img: ackrelllogo, 
 			feed_description: ackrelldesc, feed_lastBuildDate: ackrellpubDate,  feed_updated: new Date(), feed_serverUpdateID: ackrellserverupdateid, feed_items: []});	  
 	 console.log('PBK saveAcrellPendingFeedtoDB : ' + ackrellpendingurl );
 			AckrellFeed.find({feed_url: ackrellpendingurl}).count( function(err, count) {
@@ -76,15 +77,14 @@ var feedpendingackrelldb = new AckrellFeed({feed_title: ackrellPendingtitle, fee
 				if(count === 1) { // Update existing
 				Feed.update({'feed_url': feed.feed_url},{$set:{'feed_updated': feed.feed_updated, 'feed_title': feed.feed_title, 'feed_generator': feed.feed_generator, 'feed_img': feed.feed_img, 
 				'feed_description': feed.feed_description, 'feed_lastBuildDate': feed.feed_lastBuildDate, 'feed_link': feed.feed_link, 'feed_items' :feed.feed_items}}, function(err, feedone) {
-
-				//	Feed.save({'feed_url': feed.feed_url, feed}, function(err, feedone) {
 						console.log("PBK FeedOne Update");
 						if(err) {
 						console.log("PBK FeedOne update ERROR: "  + err);
 						return(err, feedone);
 						}
 					});
-				} else {  // Add new RSS Feed channel
+				} else {  
+				// Add new RSS Feed channel
 						feed.save(function(err, feedone) {
 							console.log("PBK FeedOne Save");
 							if(err) {
@@ -109,8 +109,8 @@ var feedpendingackrelldb = new AckrellFeed({feed_title: ackrellPendingtitle, fee
 						return(err, feedone);
 						}
 					});
-				} else {  
-						// Add new RSS Feed channel
+				} else { 
+				// Add new RSS Feed channel
 						feed.save(function(err, feedone) {
 							console.log("PBK FeedOne Save");
 							if(err) {
@@ -162,6 +162,9 @@ var feedpendingackrelldb = new AckrellFeed({feed_title: ackrellPendingtitle, fee
             return false;
         } else 
 			return true;
+
+
+
     }
  
  
@@ -182,7 +185,6 @@ async function isDataStale(url) {
 		console.log('PBK timediff - New channel ');
 	return true;
 	}
-
 }
 async function getChannelData(url) {
 	//await make asynch call sync
@@ -205,8 +207,6 @@ async function getAckrellChannelData(url) {
 	}
 		
 }
-
-//API Calls
 router.get('/getAckrellPending', function(req, res, next) {
 			  var channelfeedinfo = {};		
 		  	  var channelfeed = {};
@@ -215,6 +215,7 @@ router.get('/getAckrellPending', function(req, res, next) {
 				if(channelresult) {
 					console.log("PBK getAckrellPending return feed");
 					channelfeedinfo['link'] = channelresult.feed_link;
+					channelfeedinfo['url'] = channelresult.feed_url;
 					channelfeedinfo['img'] = channelresult.feed_img;
 					channelfeedinfo['description'] = channelresult.feed_description;
 					channelfeedinfo['lastBuildDate'] = channelresult.feed_lastBuildDate;
@@ -241,6 +242,7 @@ router.get('/getAckrellFeed', function(req, res, next) {
 				if(channelresult) {
 					console.log("PBK getAckrellFeed return feed");
 					channelfeedinfo['link'] = channelresult.feed_link;
+					channelfeedinfo['url'] = channelresult.feed_url;
 					channelfeedinfo['img'] = channelresult.feed_img;
 					channelfeedinfo['description'] = channelresult.feed_description;
 					channelfeedinfo['lastBuildDate'] = channelresult.feed_lastBuildDate;
@@ -265,7 +267,6 @@ router.get('/getAckrellFeed', function(req, res, next) {
 	 console.log('PBK updateAckrellPending saveFeedtoDB : ' + req.body.link );
 			AckrellFeed.findOne({feed_url: req.body.link}, function(err, feed) {
 				if(feed) { // Update existing
-				//AckrellFeed.update({'feed_url': req.body.link},{$set:{'feed_items' : req.body.feed_items}}, function(err, feedone) {
 					feed.feed_items = req.body.feed_items;
 					var updateval = feed.feed_serverUpdateID;
 					updateval = updateval + 1;
@@ -273,7 +274,6 @@ router.get('/getAckrellFeed', function(req, res, next) {
 					feed.feed_lastBuildDate = new Date();
 					feed.feed_updated = new Date();
 						feed.save(function(err, feedone) {
-				//	Feed.save({'feed_url': feed.feed_url, feed}, function(err, feedone) {
 						console.log("PBK updateAckrellPending Update");
 						if(err) {
 						console.log("PBK updateAckrellPending update ERROR: "  + err);
@@ -286,8 +286,6 @@ router.get('/getAckrellFeed', function(req, res, next) {
 			}); 
 			}
 	 	res.json({ success: true, response: req.body});
-	// if(req.body)
-	 	// console.log("PBK routes api sendnewsletter emailhtml: " + req.body.emailhtml);
 	 });
 
  router.post('/updateAckrellApproved', function(req, res, next) {
@@ -303,7 +301,6 @@ router.get('/getAckrellFeed', function(req, res, next) {
 					feed.feed_lastBuildDate = new Date();
 					feed.feed_updated = new Date();
 						feed.save(function(err, feedone) {
-
 						console.log("PBK updateAckrellApproved Update");
 						if(err) {
 						console.log("PBK updateAckrellApproved update ERROR: "  + err);
@@ -316,7 +313,6 @@ router.get('/getAckrellFeed', function(req, res, next) {
 			}); 
 			}
 	 	res.json({ success: true, response: req.body});
-
 	 });	 
 	 
 
@@ -524,6 +520,7 @@ function displayArticle(res, a, title) {
 
  // some feeds don't have author (BBC!)
  var author = a.author || title;
+  // send the article content to client
   res.write('<div class="article">')
   res.write("<h3>"+a.title +"</h3>");
   res.write("<p><strong>" +author +" - " +a.pubDate +"</strong> <br />\n");
@@ -532,7 +529,7 @@ function displayArticle(res, a, title) {
 
 
 function displayFeed(res) {
-  // send basic http headers to client
+	  // send basic http headers to client
   res.writeHead(200, {
       "Content-Type": "text/html",
       "Transfer-Encoding": "chunked"
@@ -541,15 +538,18 @@ function displayFeed(res) {
   res.write("<html>\n<head>\n<title>RSS Feeds - Stream</title>\n" +css +"</head>\n<body>");
   // loop through our list of RSS feed urls
   for (var j = 0; j < urls.length; j++) {
+    // fetch rss feed for the url:
+
     parser.parseURL(urls[j], function(err, feed) {
 			  if (err) {
 		  console.log(err);
 		  return(err, feed);
 	  }
-	  console.log("FEED url: " + feed.title + " url items: " + feed.items.length);	
+		console.log("FEED url: " + feed.title + " url items: " + feed.items.length);	
       // loop through the list of feed returned
 
       feed.items.forEach(function(entry, idx, array) {
+
         // stream article title (and what ever else you want) to client
 		var itemtitle = "";
 		var googlsubstring = "Google News";
@@ -558,13 +558,12 @@ function displayFeed(res) {
 		} else {
 			itemtitle = feed.title;
 		}
-		displayArticle(res, entry, itemtitle);
-		if(idx === array.length - 1 && j === urls.length-1) {
-		  console.log("FINISH - Normal");	  
-          res.end("</body>\n</html>"); 
-		  // end http response
+			displayArticle(res, entry, itemtitle);  
+		    if(idx === array.length - 1 && j === urls.length-1) {
+			  console.log("FINISH - Normal");	  
+          res.end("</body>\n</html>"); // end http response
         }
-		 if(idx === array.length - 1) {
+				    if(idx === array.length - 1) {
 			  console.log("FEED Finish - Normal - " + feed.title);	  
         }
 
@@ -579,23 +578,24 @@ function displayFeed(res) {
   }, 4000);
 }
 
+ 
+
+ 
+
 function returnSingleFeed(res, queryurlvar) {
 var keepGoing = true;
 var keepGoingItr = 0;
 var useErrorResp = true;
   // loop through our list of RSS feed urls
-  //for (var j = 0; j < urls.length; j++) { queryurl
-
-
     parser.parseURL(queryurlvar, function(err, feed) {
 			  if (err) {
 				  console.log(err);
-			  	return(err, feed);
+			  	res.status(400).json({ err});
+				keepGoing = false;
+				return;
 			  }
-	 console.log("FEED url: " + queryurlvar + " url items: " + feed.items.length);	
-	//console.log("parser.parseURL 2 "+j + " feed: " + feed.title);
-    // loop through the list of feed returned
-
+		console.log("FEED url: " + queryurlvar + " url items: " + feed.items.length);	
+      // loop through the list of feed returned
 	  newsid = 0;
 	  var channelfeed = {};
 	  var channelfeedinfo = {};
@@ -619,7 +619,6 @@ var useErrorResp = true;
 	  channelfeedinfo['generator'] = feed.generator;
 
 	  //Store feed in db
-	  
 	var feeddb = new Feed({feed_title: channelfeedinfo['title'], feed_url: queryurlvar, feed_type:"rss", feed_generator: channelfeedinfo['generator'], feed_img: channelfeedinfo['img'], 
 			feed_description: channelfeedinfo['description'], feed_lastBuildDate: channelfeedinfo['lastBuildDate'],  feed_updated: new Date(), feed_link: channelfeedinfo['link'],  feed_items: []});	  
 	saveFeedtoDB(feeddb);
@@ -629,28 +628,29 @@ var useErrorResp = true;
         // stream article title (and what ever else you want) to client
 		var itemtitle = "";
 		var googlsubstring = "Google News";
-		if (feed.title.includes(googlsubstring)) {
-			itemtitle = "";
+		if(feed.title.includes(googlsubstring)) {
+	        itemtitle = "";
 		} else {
 			itemtitle = feed.title;
 		}
-		var newsobj = {};
-		var feedimages = [];
-		var fulldescription = entry.content;
-
+			var newsobj = {};
+			var feedimages = [];
+			var fulldescription = entry.content;
+		
 		var dom = new jsdom(fulldescription);
 		var window = dom.window;
+ 
 		var imagestemp = window.document.querySelectorAll('img');
 			
-		    if (imagestemp && imagestemp.length > 0) {
-
-		    	window.document.querySelectorAll('img').forEach(function (entry, idx, array) {
-		    		if (window.document.querySelectorAll('img')[0]) {
-		    			feedimages.push(window.document.querySelectorAll('img')[0].getAttribute('src'));
-		    		}
-		    	});
-
-		    }
+		    if(imagestemp && imagestemp.length > 0) {
+		
+									window.document.querySelectorAll('img').forEach(function(entry, idx, array) {
+									if(window.document.querySelectorAll('img')[0]) {
+										feedimages.push(window.document.querySelectorAll('img')[0].getAttribute('src'));
+										}
+									});
+			    
+			}
 			newsobj['title'] = entry.title;
 			newsobj['link'] = entry.link;
 			newsobj['description'] = entry.content;
@@ -662,24 +662,22 @@ var useErrorResp = true;
 			newsarray.push(newsobj);
 			feeddb.feed_items.push(dbnewsobj);
 			} 
-
-	    if (idx === array.length - 1) {
-	    	keepGoing = false;
-	    	useErrorResp = false;
-	    	console.log("FEED Finish - Normal - " + feed.title + " json data: " + newsobj.link);
-	    	res.contentType('application/json');
-	    	channelfeedinfo['items'] = newsarray;
-	    	channelfeed['channel'] = channelfeedinfo;
-	    	res.send(JSON.stringify(channelfeed));
-
-	    }
+	    if(idx === array.length - 1) {
+							keepGoing = false;
+				useErrorResp = false;
+			  console.log("FEED Finish - Normal - " + feed.title + " json data: " + newsobj.link);	  
+				res.contentType('application/json');
+				channelfeedinfo['items']=newsarray;
+				channelfeed['channel'] = channelfeedinfo;
+				res.send(JSON.stringify(channelfeed));
+        }
 		newsid++;
+
       }) //  end inner for loop
     }); // end call to feed (feed-read) method
-
-
 function myLoop() {
     // ... Do something ...
+
     if(keepGoing && keepGoingItr < 6) {
 		keepGoingItr++;
         setTimeout(myLoop, 1000);
@@ -687,7 +685,7 @@ function myLoop() {
 		console.log("RETURN NEWSJSON LOOP DONE");
 		if(useErrorResp) {
 				console.log("RETURN NEWSJSON LOOP ERROR");	
-				res.status(400).json({ error });
+				var error = "Timeout error";
 		}
 	}
 }
@@ -715,8 +713,9 @@ var useErrorResp = true;
   // loop through our list of RSS feed urls
   for (var j = 0; j < urls.length; j++) {
     // fetch rss feed for the url:
+
     parser.parseURL(urls[j], function(err, feed) {
-	console.log("FEED url: " + feed.title + " url items: " + feed.items.length);	
+		console.log("FEED url: " + feed.title + " url items: " + feed.items.length);	
       // loop through the list of feed returned
 	  if (err) {
 		  console.log(err);
@@ -777,8 +776,6 @@ var useErrorResp = true;
   } // end urls for loop
 
 function myLoop() {
-    // ... Do something ...
-
     if(keepGoing && keepGoingItr < 6) {
 		keepGoingItr++;
         setTimeout(myLoop, 1000);
@@ -786,7 +783,7 @@ function myLoop() {
 		console.log("RETURN NEWSJSON LOOP DONE");
 		if(useErrorResp) {
 				console.log("RETURN NEWSJSON LOOP ERROR");	
-				res.status(400).json({ error });
+				var error = "Timeout error";
 		}
 	}
 }
