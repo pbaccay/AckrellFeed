@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var mongoose = require('mongoose');
+var shortid = require('shortid');
 var Parser = require('rss-parser');
 var parser = new Parser();
 var aws = require('aws-sdk');
@@ -10,6 +11,7 @@ var async = require('async');
 var Newsfeeds = mongoose.model('Newsfeeds');
 var Feed = mongoose.model('Feed');
 var FeedItem = mongoose.model('FeedItem');
+var WebEmail = mongoose.model('WebEmail');
 var AckrellFeed = mongoose.model('AckrellFeed');
 var AckrellFeedItem = mongoose.model('AckrellFeedItem');
 var    urls = [
@@ -20,6 +22,8 @@ var css = "";
 
 var i = 0;
 // load aws sdk
+
+
 // load aws config
 aws.config.loadFromPath('config.json');
 
@@ -31,6 +35,7 @@ var from = 'test@fixplanner.com'
 //Add Ackrell Channels One time
 var ackrellurl = "https://ackrellclub.com/rss";
 var ackrellpendingurl = "https://ackrellclub.com/pending/rss";
+var ackrellapprovedurl = "https://ackrellclub.com/approved/rss";
 var ackrelltitle = "Ackrell Club Newfeed";
 var ackrellPendingtitle = "Ackrell Club Newfeed (Pending Items)";
 var ackrelllogo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAj8AAAHgCAMAAAB98vxiAAAABGdBTUEAALGPC/xhBQAAAwBQTFRFAAAAECU/pqamAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkw5VgAAAQB0Uk5T////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AFP3ByUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjExR/NCNwAABFNJREFUeF7t0kEBwDAIADGGf8+dB+6baMh8cOcPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lD4Q+EPhT8U/lDMgzt/KPyh8IfCHwp/KPyh8IfCHwp/KPyh8IfCHwp/KPyh8IfCHwp/KPyh8IfCHwp/KPyh8IfCHwp/KPyh8IfCHwp/KPyhmIU7fyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh8Kfyj8ofCHwh/udn+IeEmjRaBmxQAAAABJRU5ErkJggg==";
@@ -53,6 +58,24 @@ var feedackrelldb = new AckrellFeed({feed_title: ackrelltitle, feed_url: ackrell
 						});
 					}
 			});
+
+var feedapprovedackrelldb = new AckrellFeed({feed_title: ackrellPendingtitle, feed_url: ackrellapprovedurl, feed_link: ackrellapprovedurl, feed_type:"rss", feed_generator: "", feed_img: ackrelllogo, 
+			feed_description: ackrelldesc, feed_lastBuildDate: ackrellpubDate,  feed_updated: new Date(), feed_serverUpdateID: ackrellserverupdateid, feed_items: []});	  
+	 console.log('PBK saveAcrellApprovedFeedtoDB : ' + ackrellapprovedurl );
+			AckrellFeed.find({feed_url: ackrellapprovedurl}).count( function(err, count) {
+				if(count === 1) { // Update existing
+				console.log("PBK Approved Ackrell Feed exists");
+				} else {  // Add new RSS Feed channel
+						feedapprovedackrelldb.save(function(err, feedackone) {
+							console.log("PBK FeedAckApprovedSave Success");
+							if(err) {
+							console.log("PBK FeedAckApproved Save ERROR: " + err);
+							return(err, feedackone);
+							}
+						});
+					}
+			});
+
 var feedpendingackrelldb = new AckrellFeed({feed_title: ackrellPendingtitle, feed_url: ackrellpendingurl, feed_link: ackrellpendingurl, feed_type:"rss", feed_generator: "", feed_img: ackrelllogo, 
 			feed_description: ackrelldesc, feed_lastBuildDate: ackrellpubDate,  feed_updated: new Date(), feed_serverUpdateID: ackrellserverupdateid, feed_items: []});	  
 	 console.log('PBK saveAcrellPendingFeedtoDB : ' + ackrellpendingurl );
@@ -70,20 +93,41 @@ var feedpendingackrelldb = new AckrellFeed({feed_title: ackrellPendingtitle, fee
 					}
 			});
 
+var pendingemail = new WebEmail({title: 'pending', link: 'pending', postDate: new Date(), type: 'pending', html: 'pending'});
+			WebEmail.find({type: 'pending'}).count( function(err, count) {
+								if(count === 1) { // Update existing
+				console.log("PBK pendingemail exists");
+				} else {  // Add new RSS Feed channel
+						pendingemail.save(function(err, webemailresult) {
+							console.log("PBK pendingemail Success: " + webemailresult._id);
+							
+							if(err) {
+							console.log("PBK pendingemail Save ERROR: " + err);
+							return(err, webemailresult);
+							}
+						});
+					}
+			});
+
 //Save channel data			
  function saveFeedtoDB(feed) {
 	 console.log('PBK saveFeedtoDB : ' + feed.feed_url );
 			Feed.find({feed_url: feed.feed_url}).count( function(err, count) {
 				if(count === 1) { // Update existing
+					var updateval = feed.feed_serverUpdateID;
+					updateval = updateval + 1;
+					feed.feed_serverUpdateID = updateval;
+
 				Feed.update({'feed_url': feed.feed_url},{$set:{'feed_updated': feed.feed_updated, 'feed_title': feed.feed_title, 'feed_generator': feed.feed_generator, 'feed_img': feed.feed_img, 
-				'feed_description': feed.feed_description, 'feed_lastBuildDate': feed.feed_lastBuildDate, 'feed_link': feed.feed_link, 'feed_items' :feed.feed_items}}, function(err, feedone) {
+				'feed_description': feed.feed_description, 'feed_lastBuildDate': feed.feed_lastBuildDate, 'feed_link': feed.feed_link, 'feed_items' :feed.feed_items, 'feed_serverUpdateID': feed.feed_serverUpdateID}},
+				function(err, feedone) {
 						console.log("PBK FeedOne Update");
 						if(err) {
 						console.log("PBK FeedOne update ERROR: "  + err);
 						return(err, feedone);
 						}
 					});
-				} else {  
+					} else { 
 				// Add new RSS Feed channel
 						feed.save(function(err, feedone) {
 							console.log("PBK FeedOne Save");
@@ -109,7 +153,7 @@ var feedpendingackrelldb = new AckrellFeed({feed_title: ackrellPendingtitle, fee
 						return(err, feedone);
 						}
 					});
-				} else { 
+				} else {
 				// Add new RSS Feed channel
 						feed.save(function(err, feedone) {
 							console.log("PBK FeedOne Save");
@@ -197,6 +241,7 @@ async function getChannelData(url) {
 		
 }
 
+
 async function getAckrellChannelData(url) {
 	//await make asynch call sync
 	var result = await AckrellFeed.findOne({"feed_url": url});
@@ -207,6 +252,78 @@ async function getAckrellChannelData(url) {
 	}
 		
 }
+
+async function getChannels() {
+	//await make asynch call sync
+  var channelfeedinfo = {};
+  var channelfeed = {};
+	var result = await Feed.find({}, {'feed_url':1, 'feed_link':1, 'feed_img':1, 'feed_description':1, 'feed_lastBuildDate':1, 'feed_updated':1, 'feed_title':1, 'feed_generator':1, 'feed_serverUpdateID':1, 'feed_items':1, '_id': 0});
+	if(result) {
+		console.log("PBK getChannels Data");
+		return result;
+	} else {
+		return null;
+	}
+}
+
+
+
+router.get('/getAllChannels', function(req, res, next) {
+	getChannels().then(result  => {
+	if(result) {
+				  var channelreturn = [];
+		console.log("PBK getAllChannels Data processing length: " + result.length);
+			result.forEach(function(chentry, idx, array) {
+						var entry = chentry;
+						var channelfeed = {};
+						var channelfeedinfo = {};
+						console.log("PBK getAllChannels Data processing title: " + entry.feed_title);
+						channelfeedinfo['link'] = entry.feed_link;
+						channelfeedinfo['img'] = entry.feed_img;
+						channelfeedinfo['description'] = entry.feed_description;
+						channelfeedinfo['lastBuildDate'] = entry.feed_lastBuildDate;
+						channelfeedinfo['lastUpdated'] = entry.feed_updated;
+						channelfeedinfo['generator'] = entry.feed_generator;	
+						channelfeedinfo['title'] = entry.feed_title;	
+						channelfeedinfo['serverUpdateID'] = entry.feed_serverUpdateID;	
+						channelfeedinfo['items'] = entry.feed_items;	
+						channelfeed['channel'] = channelfeedinfo;	
+						channelfeed['url'] = entry.feed_url;
+						channelfeed['updated'] = entry.feed_updated;
+						console.log("PBK getAllChannels Data processing url: " + channelfeed.url + " idx: " + idx);					
+						channelreturn[idx]=channelfeed;
+			}) 
+				res.send(JSON.stringify(channelreturn));
+	}	else {
+							console.log("PBK getAllChannels no Data");
+							res.send(500);	
+						}
+				});
+});
+
+ router.post('/removeChannel', function (req, res, next) {
+	console.log("PBK routes api removeChannel");
+	if (req.body && req.body.link) {
+		console.log('PBK removeChannel : ' + req.body.link);
+		Feed.remove({
+			feed_url: req.body.link
+		}, function (err, feed) {
+			if (feed) { // Update existing
+				console.log("PBK removeChannel Success");
+				if (err) {
+					console.log("PBK removeChannel update ERROR: " + err);
+					return (err, feedone);
+				}
+			} else { // Add new RSS Feed channel
+				console.log("PBK routes api removeChannel missing");
+			}
+	});
+	}
+	res.json({
+		success: true
+	});
+});
+
 router.get('/getAckrellPending', function(req, res, next) {
 			  var channelfeedinfo = {};		
 		  	  var channelfeed = {};
@@ -234,33 +351,59 @@ router.get('/getAckrellPending', function(req, res, next) {
 			});
 });
 
-router.get('/getAckrellFeed', function(req, res, next) {
-			  var channelfeedinfo = {};		
-		  	  var channelfeed = {};
-			  var queryurl = "https://ackrellclub.com/rss";
-		  getAckrellChannelData(queryurl).then(channelresult  => {
-				if(channelresult) {
-					console.log("PBK getAckrellFeed return feed");
-					channelfeedinfo['link'] = channelresult.feed_link;
-					channelfeedinfo['url'] = channelresult.feed_url;
-					channelfeedinfo['img'] = channelresult.feed_img;
-					channelfeedinfo['description'] = channelresult.feed_description;
-					channelfeedinfo['lastBuildDate'] = channelresult.feed_lastBuildDate;
-					channelfeedinfo['lastUpdated'] = channelresult.feed_updated;
-					channelfeedinfo['generator'] = channelresult.feed_generator;	
-					channelfeedinfo['title'] = channelresult.feed_title;	
-					channelfeedinfo['serverUpdateID'] = channelresult.feed_serverUpdateID;	
-					channelfeedinfo['items'] = channelresult.feed_items;	
-					channelfeed['channel'] = channelfeedinfo;	  
-					res.send(JSON.stringify(channelfeed));
-				} else {
-						console.log("PBK getAckrellFeed no Data");
-						res.send(500);	
-					}
-				console.log("PBK getAckrellFeed Still Fresh");
-			});
+router.get('/getAckrellApproved', function (req, res, next) {
+	var channelfeedinfo = {};
+	var channelfeed = {};
+	var queryurl = "https://ackrellclub.com/approved/rss";
+	getAckrellChannelData(queryurl).then(channelresult => {
+		if (channelresult) {
+			console.log("PBK getAckrellApproved return feed");
+			channelfeedinfo['link'] = channelresult.feed_link;
+			channelfeedinfo['url'] = channelresult.feed_url;
+			channelfeedinfo['img'] = channelresult.feed_img;
+			channelfeedinfo['description'] = channelresult.feed_description;
+			channelfeedinfo['lastBuildDate'] = channelresult.feed_lastBuildDate;
+			channelfeedinfo['lastUpdated'] = channelresult.feed_updated;
+			channelfeedinfo['generator'] = channelresult.feed_generator;
+			channelfeedinfo['title'] = channelresult.feed_title;
+			channelfeedinfo['serverUpdateID'] = channelresult.feed_serverUpdateID;
+			channelfeedinfo['items'] = channelresult.feed_items;
+			channelfeed['channel'] = channelfeedinfo;
+			res.send(JSON.stringify(channelfeed));
+		} else {
+			console.log("PBK getAckrellApproved no Data");
+			res.send(500);
+		}
+		console.log("PBK getAckrellApproved Still Fresh");
+	});
 });
 
+router.get('/getAckrellFeed', function (req, res, next) {
+	var channelfeedinfo = {};
+	var channelfeed = {};
+	var queryurl = "https://ackrellclub.com/rss";
+	getAckrellChannelData(queryurl).then(channelresult => {
+		if (channelresult) {
+			console.log("PBK getAckrellFeed return feed");
+			channelfeedinfo['link'] = channelresult.feed_link;
+			channelfeedinfo['url'] = channelresult.feed_url;
+			channelfeedinfo['img'] = channelresult.feed_img;
+			channelfeedinfo['description'] = channelresult.feed_description;
+			channelfeedinfo['lastBuildDate'] = channelresult.feed_lastBuildDate;
+			channelfeedinfo['lastUpdated'] = channelresult.feed_updated;
+			channelfeedinfo['generator'] = channelresult.feed_generator;
+			channelfeedinfo['title'] = channelresult.feed_title;
+			channelfeedinfo['serverUpdateID'] = channelresult.feed_serverUpdateID;
+			channelfeedinfo['items'] = channelresult.feed_items;
+			channelfeed['channel'] = channelfeedinfo;
+			res.send(JSON.stringify(channelfeed));
+		} else {
+			console.log("PBK getAckrellFeed no Data");
+			res.send(500);
+		}
+		console.log("PBK getAckrellFeed Still Fresh");
+	});
+});
  router.post('/updateAckrellPending', function(req, res, next) {
 	 console.log("PBK routes api updateAckrellPending");
 	 if(req.body && req.body.link && req.body.feed_items) {
@@ -286,7 +429,35 @@ router.get('/getAckrellFeed', function(req, res, next) {
 			}); 
 			}
 	 	res.json({ success: true, response: req.body});
+
 	 });
+	 
+ router.post('/updateAckrellPendingApproved', function(req, res, next) {
+	 console.log("PBK routes api updateAckrellPending");
+	 if(req.body && req.body.link && req.body.feed_items) {
+	 console.log('PBK updateAckrellPendingApproved saveFeedtoDB : ' + req.body.link );
+			AckrellFeed.findOne({feed_url: req.body.link}, function(err, feed) {
+				if(feed) { // Update existing
+					feed.feed_items = req.body.feed_items;
+					var updateval = feed.feed_serverUpdateID;
+					updateval = updateval + 1;
+					feed.feed_serverUpdateID = updateval;
+					feed.feed_lastBuildDate = new Date();
+					feed.feed_updated = new Date();
+						feed.save(function(err, feedone) {
+						console.log("PBK updateAckrellPendingApproved Update");
+						if(err) {
+						console.log("PBK updateAckrellPendingApproved update ERROR: "  + err);
+						return(err, feedone);
+						}
+					});
+				} else {  // Add new RSS Feed channel
+					 console.log("PBK routes api updateAckrellPendingApproved missing");
+					}
+			}); 
+			}
+	 	res.json({ success: true, response: req.body});
+	 });	 
 
  router.post('/updateAckrellApproved', function(req, res, next) {
 	 console.log("PBK routes api updateAckrellApproved");
@@ -321,6 +492,37 @@ router.get('/getAckrellFeed', function(req, res, next) {
 	 });
 
 	 
+async function getPendingWebEmailID(req, res, next) {
+	//await make asynch call sync
+	var pendingemail = new WebEmail({
+			title: 'pending',
+			link: 'pending',
+			postDate: new Date(),
+			type: 'pending',
+			html: 'pending'
+		});
+	var result = await WebEmail.findOne({
+			"type": 'pending'
+		});
+	if (result) { // Update existing
+		console.log("PBK getPendingWebEmailID exists: " + result._id);
+		var returnresult = {};
+		returnresult['emailid'] = result._id;
+		res.send(JSON.stringify(returnresult));
+	} else { // Add new RSS Feed channel
+		pendingemail.save(function (err, webemailresult) {
+			console.log("PBK getPendingWebEmailID Success: " + webemailresult._id);
+			if (err) {
+				console.log("PBK getPendingWebEmailID Save ERROR: " + err);
+				res.send(500);
+			} else {
+				var returnresult = {};
+				returnresult['emailid'] = webemailresult._id;
+				res.send(JSON.stringify(returnresult));
+			}
+		});
+	}
+}
 router.post('/publishNewsletter', function(req, res, next) {
 // load AWS SES
  console.log("PBK routes api publishnewsletter A");
@@ -342,8 +544,24 @@ var ses = new aws.SES({apiVersion: '2010-12-01'});
 console.log("PBK routes api sendnewsletter 5");
 const ebody_html1 =`<html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"><!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"><!--<![endif]-->
+    <!--[if (gte mso 9)|(IE)]>
+    <xml>
+    <o:OfficeDocumentSettings>
+    <o:AllowPNG/>
+    <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    <![endif]-->
+    <!--[if (gte mso 9)|(IE)]>
+    <style type="text/css">
+      body {width: 680px;margin: 0 auto;}
+      table {border-collapse: collapse;}
+      table, td {mso-table-lspace: 0pt;mso-table-rspace: 0pt;}
+      img {-ms-interpolation-mode: bicubic;}
+    </style>
+    <![endif]-->
     <style type="text/css">
       body, p, div {
         font-family:Roboto,Helvetica,Arial,sans-serif;
@@ -464,10 +682,190 @@ ses.sendEmail(
 	}
 	console.log('PBK route api publish Email sent:');
 	console.log(data);
-	res.json({ success: true, response: data});
+
 });  
+			WebEmail.update({"type": 'pending', "_id": req.body.emailid},{$set:{'title': req.body.subject, 'html': completedemail, 'type': 'current', 'postDate': req.body.postedDate}}, function(err, webemaildata) {
+
+			//	Feed.save({'feed_url': feed.feed_url, feed}, function(err, webemaildata) {
+					console.log("PBK webemaildata Update");
+					if(err) {
+					console.log("PBK webemaildata update ERROR: "  + err);
+					}
+					getPendingWebEmailID(req, res, next) ;
+				});
 	 });	 
  
+
+
+  
+async function updatePendingEmailID(emaildata) {
+	//await make asynch call sync
+const ebody_html1 =`<html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"><!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"><!--<![endif]-->
+    <!--[if (gte mso 9)|(IE)]>
+    <xml>
+    <o:OfficeDocumentSettings>
+    <o:AllowPNG/>
+    <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    <![endif]-->
+    <!--[if (gte mso 9)|(IE)]>
+    <style type="text/css">
+      body {width: 680px;margin: 0 auto;}
+      table {border-collapse: collapse;}
+      table, td {mso-table-lspace: 0pt;mso-table-rspace: 0pt;}
+      img {-ms-interpolation-mode: bicubic;}
+    </style>
+    <![endif]-->
+    <style type="text/css">
+      body, p, div {
+        font-family:Roboto,Helvetica,Arial,sans-serif;
+        font-size: 15px;
+      }
+      body {
+        color: #626262;
+      }
+      body a {
+        color: #7ED321;
+        text-decoration: none;
+      }
+      p { margin: 0; padding: 0; }
+      table.wrapper {
+        width:100% !important;
+        table-layout: fixed;
+        -webkit-font-smoothing: antialiased;
+        -webkit-text-size-adjust: 100%;
+        -moz-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+      img.max-width {
+        max-width: 100% !important;
+      }
+      .column.of-2 {
+        width: 50%;
+      }
+      .column.of-3 {
+        width: 33.333%;
+      }
+      .column.of-4 {
+        width: 25%;
+      }
+      @media screen and (max-width:480px) {
+        .preheader .rightColumnContent,
+        .footer .rightColumnContent {
+            text-align: left !important;
+        }
+        .preheader .rightColumnContent div,
+        .preheader .rightColumnContent span,
+        .footer .rightColumnContent div,
+        .footer .rightColumnContent span {
+          text-align: left !important;
+        }
+        .preheader .rightColumnContent,
+        .preheader .leftColumnContent {
+          font-size: 80% !important;
+          padding: 5px 0;
+        }
+        table.wrapper-mobile {
+          width: 100% !important;
+          table-layout: fixed;
+        }
+        img.max-width {
+          height: auto !important;
+          max-width: 480px !important;
+        }
+        a.bulletproof-button {
+          display: block !important;
+          width: auto !important;
+          font-size: 80%;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+        }
+        .columns {
+          width: 100% !important;
+        }
+        .column {
+          display: block !important;
+          width: 100% !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+      }
+    </style>
+    <!--user entered Head Start-->
+    
+     <!--End Head user entered-->
+  </head>
+  <body>`;
+const ebody_html2=`</body></html>`; 	
+	
+	var result = await WebEmail.find({"type": 'pending'}).count( function(err, count) {
+				if(count === 1) { // Update existing
+				var completedemail = ebody_html1 + emaildata.html + ebody_html2;
+				WebEmail.update({"type": 'pending'},{$set:{'title': emaildata.subject, 'html': completedemail}}, function(err, webemaildata) {
+						console.log("PBK webemaildata Update");
+						if(err) {
+						console.log("PBK webemaildata update ERROR: "  + err);
+						return(err, webemaildata);
+						}
+					});
+				}
+	else {
+		return null;
+	}
+		
+})
+}
+
+router.get('/pendingwebemail', function(req, res, next) {
+	console.log("PBK pendingwebemail");
+	getPendingWebEmailID(req, res, next);
+});
+
+router.post('/updatependingwebemail', function (req, res, next) {
+	console.log("PBK routes api updatependingwebemail");
+	if (req.body && req.body.emaildata) {
+		updatePendingEmailID(req.body.emaildata);
+		console.log('PBK updatependingwebemail');
+	}
+	res.json({
+		success: true
+	});
+});
+
+async function getWebEmailHtml(queryurl) {
+	//await make asynch call sync
+	var result = await WebEmail.findOne({
+			"_id": queryurl
+		});
+	if (result) {
+		return result;
+	} else {
+		return null;
+	}
+}
+
+router.get('/newsletter', function (req, res, next) {
+	console.log("PBK newsletter TEST: " + req.query.version);
+	var queryurl = req.query.version;
+	getWebEmailHtml(queryurl).then(result => {
+		if (result) {
+			console.log("PBK newsletter result: " + result._id);
+			if (result && result.html) {
+				res.send(result.html);
+			}
+		} else {
+			console.log("PBK pendingwebemail no Data");
+			res.send(500);
+		}
+	});
+});
+
 router.get('/rsstest', function(req, res, next) {
 	console.log("PBK RSS TEST: " + req.query.url);
 	var queryurl = req.query.url;
@@ -482,11 +880,10 @@ router.get('/rsstest', function(req, res, next) {
 
 	isDataStale(queryurl).then(stalecheck => {
 			console.log("PBK stalecheck value: " + stalecheck);
-		if(!stalecheck) {			
+		if(!stalecheck) {
 			console.log("PBK return feed fresh");
 		  var channelfeedinfo = {};		
 		  	  var channelfeed = {};
-			  
 		  getChannelData(queryurl).then(channelresult  => {
 				if(channelresult) {
 					console.log("PBK return feed fresh2");
@@ -549,7 +946,6 @@ function displayFeed(res) {
       // loop through the list of feed returned
 
       feed.items.forEach(function(entry, idx, array) {
-
         // stream article title (and what ever else you want) to client
 		var itemtitle = "";
 		var googlsubstring = "Google News";
@@ -566,9 +962,9 @@ function displayFeed(res) {
 				    if(idx === array.length - 1) {
 			  console.log("FEED Finish - Normal - " + feed.title);	  
         }
-
       }) //  end inner for loop
     }); // end call to feed (feed-read) method
+
   } // end urls for loop
 
 
@@ -586,7 +982,6 @@ function returnSingleFeed(res, queryurlvar) {
 var keepGoing = true;
 var keepGoingItr = 0;
 var useErrorResp = true;
-  // loop through our list of RSS feed urls
     parser.parseURL(queryurlvar, function(err, feed) {
 			  if (err) {
 				  console.log(err);
@@ -620,7 +1015,7 @@ var useErrorResp = true;
 
 	  //Store feed in db
 	var feeddb = new Feed({feed_title: channelfeedinfo['title'], feed_url: queryurlvar, feed_type:"rss", feed_generator: channelfeedinfo['generator'], feed_img: channelfeedinfo['img'], 
-			feed_description: channelfeedinfo['description'], feed_lastBuildDate: channelfeedinfo['lastBuildDate'],  feed_updated: new Date(), feed_link: channelfeedinfo['link'],  feed_items: []});	  
+			feed_description: channelfeedinfo['description'], feed_lastBuildDate: channelfeedinfo['lastBuildDate'],  feed_updated: new Date(), feed_serverUpdateID: 1, feed_link: channelfeedinfo['link'],  feed_items: []});	  
 	saveFeedtoDB(feeddb);
 	  channelfeed['channel'] = channelfeedinfo;
       feed.items.forEach(function(entry, idx, array) {
@@ -639,11 +1034,8 @@ var useErrorResp = true;
 		
 		var dom = new jsdom(fulldescription);
 		var window = dom.window;
- 
 		var imagestemp = window.document.querySelectorAll('img');
-			
 		    if(imagestemp && imagestemp.length > 0) {
-		
 									window.document.querySelectorAll('img').forEach(function(entry, idx, array) {
 									if(window.document.querySelectorAll('img')[0]) {
 										feedimages.push(window.document.querySelectorAll('img')[0].getAttribute('src'));
@@ -662,6 +1054,7 @@ var useErrorResp = true;
 			newsarray.push(newsobj);
 			feeddb.feed_items.push(dbnewsobj);
 			} 
+			//dbnewsarray.push(dbnewsobj);
 	    if(idx === array.length - 1) {
 							keepGoing = false;
 				useErrorResp = false;
@@ -670,14 +1063,16 @@ var useErrorResp = true;
 				channelfeedinfo['items']=newsarray;
 				channelfeed['channel'] = channelfeedinfo;
 				res.send(JSON.stringify(channelfeed));
+
         }
 		newsid++;
 
       }) //  end inner for loop
     }); // end call to feed (feed-read) method
+
+
 function myLoop() {
     // ... Do something ...
-
     if(keepGoing && keepGoingItr < 6) {
 		keepGoingItr++;
         setTimeout(myLoop, 1000);
@@ -713,13 +1108,11 @@ var useErrorResp = true;
   // loop through our list of RSS feed urls
   for (var j = 0; j < urls.length; j++) {
     // fetch rss feed for the url:
-
     parser.parseURL(urls[j], function(err, feed) {
 		console.log("FEED url: " + feed.title + " url items: " + feed.items.length);	
       // loop through the list of feed returned
 	  if (err) {
-		  console.log(err);
-		  
+		  console.log(err);  
 	  }
 	  newsid = 0;
 	  var channelfeed = {};
@@ -776,13 +1169,15 @@ var useErrorResp = true;
   } // end urls for loop
 
 function myLoop() {
+    // ... Do something ...
+
     if(keepGoing && keepGoingItr < 6) {
 		keepGoingItr++;
         setTimeout(myLoop, 1000);
     } else {
 		console.log("RETURN NEWSJSON LOOP DONE");
 		if(useErrorResp) {
-				console.log("RETURN NEWSJSON LOOP ERROR");	
+				console.log("RETURN NEWSJSON LOOP ERROR");
 				var error = "Timeout error";
 		}
 	}
