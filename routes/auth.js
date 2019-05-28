@@ -1,6 +1,5 @@
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
-var secret = 'ackrellnodesecret';
 var routesAuthConfig          = require('./authconig');
 
 var isAuthenticated = function (req, res, next) {

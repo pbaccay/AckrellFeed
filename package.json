@@ -34,6 +34,7 @@
     "request": "^2.81.0",
     "rss-parser": "*",
     "serve-favicon": "~2.2.0",
+    "shortid": "^2.2.14",	
     "underscore": "^1.8.3"
   },
   "devDependencies": {},
