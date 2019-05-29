@@ -134,6 +134,7 @@ app.use(flash());
 app.use(authentication());
 
 authRoutes(app, passport); 
+app.use('/api/', apiroutes);
 app.use('/user/', apiroutes);
 
 // catch 404 and forward to error handler

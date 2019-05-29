@@ -268,7 +268,7 @@ async function getChannels() {
 
 
 
-router.get('/getAllChannels', function(req, res, next) {
+router.get('/getallchannels', function(req, res, next) {
 	getChannels().then(result  => {
 	if(result) {
 				  var channelreturn = [];
@@ -324,7 +324,7 @@ router.get('/getAllChannels', function(req, res, next) {
 	});
 });
 
-router.get('/getAckrellPending', function(req, res, next) {
+router.get('/getackrellpending', function(req, res, next) {
 			  var channelfeedinfo = {};		
 		  	  var channelfeed = {};
 			  var queryurl = "https://ackrellclub.com/pending/rss";
@@ -351,7 +351,7 @@ router.get('/getAckrellPending', function(req, res, next) {
 			});
 });
 
-router.get('/getAckrellApproved', function (req, res, next) {
+router.get('/getackrellapproved', function (req, res, next) {
 	var channelfeedinfo = {};
 	var channelfeed = {};
 	var queryurl = "https://ackrellclub.com/approved/rss";
@@ -378,7 +378,7 @@ router.get('/getAckrellApproved', function (req, res, next) {
 	});
 });
 
-router.get('/getAckrellFeed', function (req, res, next) {
+router.get('/getackrellfeed', function (req, res, next) {
 	var channelfeedinfo = {};
 	var channelfeed = {};
 	var queryurl = "https://ackrellclub.com/rss";
@@ -404,7 +404,7 @@ router.get('/getAckrellFeed', function (req, res, next) {
 		console.log("PBK getAckrellFeed Still Fresh");
 	});
 });
- router.post('/updateAckrellPending', function(req, res, next) {
+ router.post('/updateackrellpending', function(req, res, next) {
 	 console.log("PBK routes api updateAckrellPending");
 	 if(req.body && req.body.link && req.body.feed_items) {
 	 console.log('PBK updateAckrellPending saveFeedtoDB : ' + req.body.link );
@@ -432,7 +432,7 @@ router.get('/getAckrellFeed', function (req, res, next) {
 
 	 });
 	 
- router.post('/updateAckrellPendingApproved', function(req, res, next) {
+ router.post('/updateackrellpendingapproved', function(req, res, next) {
 	 console.log("PBK routes api updateAckrellPending");
 	 if(req.body && req.body.link && req.body.feed_items) {
 	 console.log('PBK updateAckrellPendingApproved saveFeedtoDB : ' + req.body.link );
@@ -459,7 +459,7 @@ router.get('/getAckrellFeed', function (req, res, next) {
 	 	res.json({ success: true, response: req.body});
 	 });	 
 
- router.post('/updateAckrellApproved', function(req, res, next) {
+ router.post('/updateackrellapproved', function(req, res, next) {
 	 console.log("PBK routes api updateAckrellApproved");
 	 if(req.body && req.body.link && req.body.feed_items) {
 	 console.log('PBK updateAckrellApproved saveFeedtoDB : ' + req.body.link );
@@ -487,7 +487,7 @@ router.get('/getAckrellFeed', function (req, res, next) {
 	 });	 
 	 
 
- router.post('/sendNewsletter', function(req, res, next) {
+ router.post('/sendnewsletter', function(req, res, next) {
 	 console.log("PBK routes api sendnewsletter");
 	 });
 
@@ -523,7 +523,7 @@ async function getPendingWebEmailID(req, res, next) {
 		});
 	}
 }
-router.post('/publishNewsletter', function(req, res, next) {
+router.post('/publishnewsletter', function(req, res, next) {
 // load AWS SES
  console.log("PBK routes api publishnewsletter A");
 
@@ -866,7 +866,7 @@ router.get('/newsletter', function (req, res, next) {
 	});
 });
 
-router.get('/rsstest', function(req, res, next) {
+router.get('/getchannel', function(req, res, next) {
 	console.log("PBK RSS TEST: " + req.query.url);
 	var queryurl = req.query.url;
 	
