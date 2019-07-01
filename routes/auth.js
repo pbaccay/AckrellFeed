@@ -1,6 +1,6 @@
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
-var routesAuthConfig          = require('./authconig');
+var routesAuthConfig          = require('./authconfig');
 
 var isAuthenticated = function (req, res, next) {
 	// if user is authenticated in the session, call the next() to call the next request handler 

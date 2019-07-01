@@ -1,5 +1,6 @@
 # Logs
 config.json
+package-lock.json
 logs
 *.log
 npm-debug.log*
@@ -36,6 +37,7 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+public/
 
 # TypeScript v1 declaration files
 typings/
