@@ -14,6 +14,7 @@ var publicPaths = [
     '/images',
     '/css',
     '/img',
+    '/js',
 	'/'
 ];
 

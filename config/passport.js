@@ -7,7 +7,7 @@ var passportJWT = require('passport-jwt');
 var JWTStrategy = passportJWT.Strategy;
 var ExtractJWT = require('passport-jwt').ExtractJwt;  
 var bcrypt = require('bcrypt');
-var authConfig          = require('./auth');
+var authConfig          = require('./auth.js');
 
 module.exports = function(passport,User) {
 
@@ -72,7 +72,7 @@ module.exports = function(passport,User) {
         'jwt', 
         
         new JWTStrategy({
-		jwtFromRequest : ExtractJWT.fromAuthHeaderAsBearerToken(), 
+		jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(), 
 		secretOrKey: authConfig.ackrell.clientSecret
 	  },
 	  (jwtPayload, done) => {

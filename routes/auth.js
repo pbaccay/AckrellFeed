@@ -16,16 +16,16 @@ var isAuthenticated = function (req, res, next) {
 }
 
 module.exports = function(app,passport) {
-
+/*
 	app.post('/login', passport.authenticate('local-login', {		
 		successRedirect : '/ackrellnews', 
 		failureRedirect : '/#signin', 
 		failureFlash : true 
 	}));
-	
+*/	
 
 	
-	app.post('/testlogin', (req, res) => {
+	app.post('/login', (req, res) => {
 	passport.authenticate(
     'local-login',
     { session: false },
@@ -54,7 +54,7 @@ module.exports = function(app,passport) {
 			}
 
 			// generate a signed json web token and return it in the response 
-			const token = jwt.sign(JSON.stringify(payload), authConfig.ackrell.clientSecret);
+			const token = jwt.sign(JSON.stringify(payload), routesAuthConfig.ackrell.clientSecret);
 			console.log("PBK routes auth login jwt: ", token);
 			// assign our jwt to the cookie 
 			res.json({ success: true, message: 'Token login granted', token, user: req.body.email });
@@ -64,7 +64,7 @@ module.exports = function(app,passport) {
   )(req, res);
 });
 
-	app.post('/testsignup', (req, res) => {
+	app.post('/signup', (req, res) => {
 	passport.authenticate(
 	'local-signup',  
 	{ session: false },
@@ -92,7 +92,7 @@ module.exports = function(app,passport) {
 			  res.status(400).send({ error });
 			}
 			// generate a signed json web token and return it in the response 
-			const token = jwt.sign(JSON.stringify(payload), secret);
+			const token = jwt.sign(JSON.stringify(payload), routesAuthConfig.ackrell.clientSecret);
 			console.log("PBK routes signup auth jwt: ", token);
 			// assign our jwt to the cookie 
 			res.json({ success: true, message: 'Token signup granted', token, user: req.body.email });
@@ -102,12 +102,6 @@ module.exports = function(app,passport) {
   )(req, res);
 });
 
-	app.get('/getstatus', passport.authenticate('jwt', {session: false}),
-  (req, res) => {
-    const { user } = req;
-
-    res.status(200).send({ user });
-  });
 
 	app.post('/api/login', passport.authenticate('local-login', {
 		successRedirect : '/ackrellnews', 
@@ -117,6 +111,7 @@ module.exports = function(app,passport) {
 	  
 	app.get('/home', passport.authenticate('jwt', { session : false }),  
         function (req, res) {	
+			  			console.log("PBK routes auth /home");
 			res.json({
 			message : 'You made it to the secure route',
 			user : req.user,
@@ -124,13 +119,13 @@ module.exports = function(app,passport) {
 			}); 
 		}
   );
-	
+/*	
 	app.post('/signup', passport.authenticate('local-signup', {
 		successRedirect : '/ackrellnews', 
 		failureRedirect : '/#signin', 
 		failureFlash : true 
 	}));
-
+*/
 	app.get('/logout', function(req, res) {
 		req.logout();
 		res.redirect('/#signin');

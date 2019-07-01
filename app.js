@@ -101,6 +101,7 @@ var Newsfeeds = require('./models/newsfeeds.js');
 var passportConfig  = require('./config/passport');
 var authentication  = require('./middleware/authentication');
 var authRoutes      = require('./routes/auth');
+var userRoutes = require('./routes/user.js');
 var apiroutes = require('./routes/api.js');
 
 var dbConfig = require('./db.js');
@@ -135,8 +136,8 @@ app.use(authentication());
 
 authRoutes(app, passport); 
 app.use('/api/', apiroutes);
-app.use('/user/', apiroutes);
-
+//app.use('/user/', apiroutes);
+app.use('/user', passport.authenticate('jwt', {session: false}), userRoutes);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
 	console.log('PBK app 404');
